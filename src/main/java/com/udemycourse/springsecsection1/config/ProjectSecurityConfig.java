@@ -13,7 +13,7 @@ public class ProjectSecurityConfig {
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(requests -> requests.requestMatchers(
                 "/myAccount", "/myBalance", "/myLoans", "/myCards").authenticated()
-                .requestMatchers("/myNotices", "/contact", "/error").permitAll()
+                .requestMatchers("/myNotices", "/contact", "/error", "/ping").permitAll()
         );
         httpSecurity.formLogin(flc -> flc.disable());
         httpSecurity.httpBasic(Customizer.withDefaults());
