@@ -2,6 +2,7 @@ package com.udemycourse.springsecsection1.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 
 @Configuration
 public class ProjectSecurityConfig {
@@ -28,7 +30,7 @@ public class ProjectSecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        UserDetails user = User.withUsername("user").password("{bcrypt}$2a$12$svkCQYDC8sdtJaCuoiSMXOJfWrgt1tmwnfJ0yg5vk2/eGYcrpJFGa").authorities("read").build();
+        UserDetails user = User.withUsername("user").password("{bcrypt}$2a$12$rCFT9KPUDNXGWm57ANr1qeGYwqmfATgPLjZWDu6eDLnLBkqxt07R2").authorities("read").build();
         UserDetails admin = User.withUsername("admin").password("{bcrypt}$2a$12$k9N6.VShRRYAAuiia9/Rieus8QwL0gNWlZbLzCf8x2ma/zWoXbRdO").authorities("admin").build();
         return new InMemoryUserDetailsManager(user, admin);
     }
@@ -37,5 +39,11 @@ public class ProjectSecurityConfig {
     public PasswordEncoder passwordEncoderService() {
         // uses bcrypt password encoder by default
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Bean
+    public CompromisedPasswordChecker compromisedPasswordCheckerService() {
+        // returns if a password has been compromised
+        return new HaveIBeenPwnedRestApiPasswordChecker();
     }
 }
