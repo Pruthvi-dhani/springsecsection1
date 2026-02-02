@@ -15,7 +15,7 @@ public class Customer {
 
     @Nonnull
     @Column(nullable = false)
-    private String name;
+    private String pwd;
 
     @Nonnull
     @Column(nullable = false)

@@ -34,11 +34,6 @@ public class ProjectSecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(@Autowired DataSource dataSource) {
-        return new JdbcUserDetailsManager(dataSource);
-    }
-
-    @Bean
     public PasswordEncoder passwordEncoderService() {
         // uses bcrypt password encoder by default
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
