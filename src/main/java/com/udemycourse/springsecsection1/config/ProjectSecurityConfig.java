@@ -1,5 +1,6 @@
 package com.udemycourse.springsecsection1.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
@@ -12,8 +13,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
+
+import javax.sql.DataSource;
+
 
 @Configuration
 public class ProjectSecurityConfig {
@@ -29,10 +34,8 @@ public class ProjectSecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails user = User.withUsername("user").password("{bcrypt}$2a$12$rCFT9KPUDNXGWm57ANr1qeGYwqmfATgPLjZWDu6eDLnLBkqxt07R2").authorities("read").build();
-        UserDetails admin = User.withUsername("admin").password("{bcrypt}$2a$12$k9N6.VShRRYAAuiia9/Rieus8QwL0gNWlZbLzCf8x2ma/zWoXbRdO").authorities("admin").build();
-        return new InMemoryUserDetailsManager(user, admin);
+    public UserDetailsService userDetailsService(@Autowired DataSource dataSource) {
+        return new JdbcUserDetailsManager(dataSource);
     }
 
     @Bean
