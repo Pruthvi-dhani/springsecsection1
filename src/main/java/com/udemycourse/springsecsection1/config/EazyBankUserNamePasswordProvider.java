@@ -27,7 +27,6 @@ public class EazyBankUserNamePasswordProvider implements AuthenticationProvider 
         UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
         if(passwordEncoder.matches(pwd, userDetails.getPassword())) {
             // fetch the age details and provide custom logic
-            System.out.println("cfdfvvfvgfrfre");
             return new UsernamePasswordAuthenticationToken(userName, pwd, userDetails.getAuthorities());
         }
         throw new BadCredentialsException("Invalid password");
