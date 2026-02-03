@@ -1,6 +1,8 @@
 package com.udemycourse.springsecsection1.config;
 
+import com.udemycourse.springsecsection1.exceptionhandling.CustomBasicAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 
@@ -23,13 +26,16 @@ import javax.sql.DataSource;
 @Configuration
 public class ProjectSecurityConfig {
     @Bean
-    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity httpSecurity,
+                                                   @Autowired @Qualifier("customAuthEntry")
+                                                   AuthenticationEntryPoint authenticationEntryPoint) throws Exception {
         httpSecurity.authorizeHttpRequests(requests -> requests.requestMatchers(
                 "/myAccount", "/myBalance", "/myLoans", "/myCards", "/api/register").authenticated()
                 .requestMatchers("/myNotices", "/contact", "/error", "/ping").permitAll()
         );
         httpSecurity.formLogin(Customizer.withDefaults());
-        httpSecurity.httpBasic(Customizer.withDefaults());
+        httpSecurity.httpBasic(
+                hbc -> hbc.authenticationEntryPoint(authenticationEntryPoint));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
     }
