@@ -18,6 +18,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 
 import javax.sql.DataSource;
@@ -28,14 +29,20 @@ public class ProjectSecurityConfig {
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity httpSecurity,
                                                    @Autowired @Qualifier("customAuthEntry")
-                                                   AuthenticationEntryPoint authenticationEntryPoint) throws Exception {
+                                                   AuthenticationEntryPoint authenticationEntryPoint,
+                                                   @Autowired @Qualifier("customAuthorizationEntry")
+                                                   AccessDeniedHandler accessDeniedHandler
+    ) throws Exception {
         httpSecurity.authorizeHttpRequests(requests -> requests.requestMatchers(
                 "/myAccount", "/myBalance", "/myLoans", "/myCards", "/api/register").authenticated()
                 .requestMatchers("/myNotices", "/contact", "/error", "/ping").permitAll()
         );
-        httpSecurity.formLogin(Customizer.withDefaults());
-        httpSecurity.httpBasic(
-                hbc -> hbc.authenticationEntryPoint(authenticationEntryPoint));
+//        httpSecurity.formLogin(Customizer.withDefaults());
+        httpSecurity.httpBasic(Customizer.withDefaults());
+        httpSecurity.exceptionHandling(
+                hbc ->
+                        hbc.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler)
+        );
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
     }

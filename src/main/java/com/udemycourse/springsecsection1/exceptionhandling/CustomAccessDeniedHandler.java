@@ -4,8 +4,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
@@ -14,21 +14,20 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component("customAuthEntry")
-public class CustomBasicAuthenticationEntryPoint implements AuthenticationEntryPoint {
+@Component("customAuthorizationEntry")
+public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response,
-                         AuthenticationException authException)
-            throws IOException, ServletException {
-        response.setHeader("eazybank-error-reason", "Authentication failed");
+    public void handle(HttpServletRequest request, HttpServletResponse response,
+                       AccessDeniedException accessDeniedException) throws IOException, ServletException {
+        response.setHeader("eazybank-error-reason", "Authorization failed");
 //        response.sendError(HttpStatus.UNAUTHORIZED.value(), "HttpStatus.UNAUTHORIZED.getReasonPhrase()");
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setStatus(HttpStatus.FORBIDDEN.value());
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", Instant.now().toString());
-        body.put("status", HttpStatus.UNAUTHORIZED.value());
-        body.put("error", "Unauthenticated");
+        body.put("status", HttpStatus.FORBIDDEN.value());
+        body.put("error", "Unauthorized");
         body.put("message", "Authentication is required to access this resource.");
         body.put("path", request.getRequestURI());
 
